@@ -4,11 +4,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.example.todo_app_backend.models.Todo;
+import com.example.todo_app_backend.dtos.MetricsDTO;
+import com.example.todo_app_backend.dtos.TodoDTO;
 import com.example.todo_app_backend.repositories.TodoRepository;
 
 @Service
@@ -16,40 +16,44 @@ public class TodoService {
     @Autowired
     private TodoRepository todoRepository; 
 
-    public List<Todo> getTodos(){
-        return todoRepository.getTodos();
+    public List<TodoDTO> getTodosService(){
+        return todoRepository.getTodosRepository();
     }
 
-    public Optional<Todo> getTodoById(String id){
-        return todoRepository.getTodoById(id); 
+    public Optional<TodoDTO> getTodoByIdService(String id){
+        return todoRepository.getTodoByIdRepository(id); 
     }
 
-    public Todo createTodo(Todo todo){
-        return todoRepository.createTodo(todo);
+    public TodoDTO createTodoService(TodoDTO todo){
+        return todoRepository.createTodoRepository(todo);
     }
 
-    public Todo updateTodo(String id, Todo todo){
+    public TodoDTO updateTodoService(String id, TodoDTO todo){
         return todoRepository.updateTodo(id, todo);
     }
     
-    public boolean deleteTodo(String id){
-        return todoRepository.deleteTodo(id);
+    public boolean deleteTodoService(String id){
+        return todoRepository.deleteTodoRepository(id);
     }
 
-    public void markStatus(String id){
-        Optional<Todo> todo = todoRepository.getTodoById(id);
+    public boolean changeStatusService(String id){
+        Optional<TodoDTO> todo = todoRepository.getTodoByIdRepository(id);
         if (todo.isPresent() && !todo.get().isDone()) {
-            // if the todo exists and is not done, mark it as done 
-            todoRepository.markStatus(id, LocalDateTime.now());
+            return todoRepository.changeStatusRepository(id, LocalDateTime.now());
         }
         else if(todo.isPresent() && todo.get().isDone()){
-            // if its done then its marked as undone and set the done date to null
-            todoRepository.markStatus(id, null);
+            return todoRepository.changeStatusRepository(id, null);
         }
+        return false;
     }
 
-    public Map<String, String> getMetrics(){
-        Map<String, String> metrics = todoRepository.getMetrics(); 
-        return metrics; 
+    public MetricsDTO getMetricsService(){
+        Map<String, String> metrics = todoRepository.getMetricsRepository();
+        String generalAverage = metrics.get("general"); 
+        String lowAverage = metrics.get("low"); 
+        String mediumAverage = metrics.get("medium"); 
+        String highAverage = metrics.get("high"); 
+        MetricsDTO metricsResponse = new MetricsDTO(generalAverage, lowAverage, mediumAverage, highAverage);
+        return metricsResponse;
     }
 }

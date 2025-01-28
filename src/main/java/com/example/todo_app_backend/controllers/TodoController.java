@@ -1,14 +1,17 @@
 package com.example.todo_app_backend.controllers;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.example.todo_app_backend.models.Todo;
 
+import com.example.todo_app_backend.dtos.MetricsDTO;
+import com.example.todo_app_backend.dtos.TodoDTO;
 import com.example.todo_app_backend.services.TodoService;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -28,44 +31,44 @@ public class TodoController {
 
     // Get todos /todos
     @GetMapping("")
-    public List<Todo> getTodos() {
-        return todoService.getTodos();
+    public List<TodoDTO> getTodos() {
+        return todoService.getTodosService();
     }
 
     // Get one single todo 
     @GetMapping("/{id}")
-    public Optional<Todo> getTodoById(@PathVariable String id) {
-        return todoService.getTodoById(id); 
+    public Optional<TodoDTO> getTodoById(@PathVariable String id) {
+        return todoService.getTodoByIdService(id); 
     }
  
     // Create todo /todos
     @PostMapping("")
-    public Todo createTodo(@RequestBody Todo todo) {
-        return todoService.createTodo(todo);
+    public TodoDTO createTodo(@RequestBody TodoDTO todo) {
+        return todoService.createTodoService(todo);
     }
 
     // Update todo /todos/:id
     @PutMapping("/{id}")
-    public Todo updateTodo(@PathVariable String id, @RequestBody Todo todo) {
-        return todoService.updateTodo(id, todo);
+    public TodoDTO updateTodo(@PathVariable String id, @RequestBody TodoDTO todo) {
+        return todoService.updateTodoService(id, todo);
     }
 
     // Update todo status 
     @PutMapping("/{id}/changeStatus")
-    public void changeTodoStatus(@PathVariable String id) {
-        todoService.markStatus(id);
+    public boolean changeTodoStatus(@PathVariable String id) {
+        return todoService.changeStatusService(id);
     }
 
     @DeleteMapping("/{id}")
     public boolean deleteTodo(@PathVariable String id) {
-        return todoService.deleteTodo(id); 
+        return todoService.deleteTodoService(id); 
     }
 
     @GetMapping("/metrics")
-    public Map<String, String> getMetrics() {
-        return todoService.getMetrics();
+    public ResponseEntity<Object> getMetrics() {
+        MetricsDTO metrics = todoService.getMetricsService();
+        Map<String, MetricsDTO> response = new HashMap<>(); 
+        response.put("metrics", metrics); 
+        return ResponseEntity.ok(metrics); 
     }
-    
-
-    
 }

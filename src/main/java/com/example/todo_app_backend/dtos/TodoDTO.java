@@ -1,10 +1,10 @@
-package com.example.todo_app_backend.models;
+package com.example.todo_app_backend.dtos;
 import java.util.Optional;
 import java.util.UUID;
 
 import java.time.LocalDateTime;
 
-public class Todo {
+public class TodoDTO {
     private String id; 
     private String name; 
     private LocalDateTime dueDate; 
@@ -13,12 +13,12 @@ public class Todo {
     private String priority; 
     private LocalDateTime creationDate; 
 
-    public Todo(){
+    public TodoDTO(){
         this.id = UUID.randomUUID().toString();
         this.creationDate = LocalDateTime.now();
     }
 
-    public Todo(String name, String priority, Optional<LocalDateTime> dueDate){
+    public TodoDTO(String name, String priority, Optional<LocalDateTime> dueDate){
         this.name = name;
         this.dueDate = dueDate.orElse(null); 
         this.priority = priority;

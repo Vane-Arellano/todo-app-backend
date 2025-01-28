@@ -1,7 +1,6 @@
 package com.example.todo_app_backend.repositories;
 import org.springframework.stereotype.Repository;
-
-import com.example.todo_app_backend.models.Todo;
+import com.example.todo_app_backend.dtos.TodoDTO;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -14,27 +13,28 @@ import java.time.Duration;
 
 @Repository
 public class TodoRepository {
-    private final List<Todo> todos = new ArrayList<>();
+    private final List<TodoDTO> todos = new ArrayList<>();
 
     // Function to get all todos 
-    public List<Todo> getTodos(){
+    public List<TodoDTO> getTodosRepository(){
         return todos;
     }
 
     // Function to get todo by ID 
-    public Optional<Todo> getTodoById(String id){
+    public Optional<TodoDTO> getTodoByIdRepository(String id){
         return todos.stream().filter(todo -> todo.getId().equals(id)).findFirst();
     }
 
     // Create a new todo 
-    public Todo createTodo(Todo todo){
+    public TodoDTO createTodoRepository(TodoDTO todo){
+        
         todos.add(todo);
         return todo;
     }
 
     // Update a todo 
-    public Todo updateTodo(String id, Todo todo){ 
-        getTodoById(id).ifPresent(oldTodo -> {
+    public TodoDTO updateTodo(String id, TodoDTO todo){ 
+        getTodoByIdRepository(id).ifPresent(oldTodo -> {
             oldTodo.setName(todo.getName());
             oldTodo.setPriority(todo.getPriority()); 
             oldTodo.setDueDate(todo.getDueDate());
@@ -43,62 +43,114 @@ public class TodoRepository {
     }
 
     // Delete a todo 
-    public boolean deleteTodo(String id) {
+    public boolean deleteTodoRepository(String id) {
         return todos.removeIf(todo -> todo.getId().equals(id));
     }
 
     // Mark a todo as done 
-    public void markStatus(String id, LocalDateTime doneDate){
-        getTodoById(id).ifPresent(todo -> {
-            todo.setDone(!todo.isDone());
-            todo.setDoneDate(doneDate);
-        });
+    public boolean changeStatusRepository(String id, LocalDateTime doneDate){
+        Optional<TodoDTO> todoOptional = getTodoByIdRepository(id);
+
+        if (todoOptional.isPresent()) {
+            TodoDTO todo = todoOptional.get();
+            todo.setDone(!todo.isDone());  
+            todo.setDoneDate(doneDate);    
+
+            return true; 
+        }
+
+        return false;
+        
     }
 
-    public Map<String, String> getMetrics() {
-        double all = calculateAllMetrics(); 
-        double low = calculateMetricsByPriority("low");
-        double medium = calculateMetricsByPriority("medium"); 
-        double high = calculateMetricsByPriority("high"); 
+    public Map<String, String> getMetricsRepository() {
+        String all = calculateAllMetrics(); 
+        
+        String low = calculateMetricsByPriority("low");
+        String medium = calculateMetricsByPriority("medium"); 
+        String high = calculateMetricsByPriority("high"); 
 
         Map<String, String> metrics = new HashMap<>();
-        
-        metrics.put("general", String.valueOf(all));
-        metrics.put("low", String.valueOf(low));
-        metrics.put("medium", String.valueOf(medium));
-        metrics.put("high", String.valueOf(high));
+     
+        metrics.put("general", all);
+        metrics.put("low", low);
+        metrics.put("medium", medium);
+        metrics.put("high", high);
 
         // Return the map
         return metrics;
     }
 
-    private List<Todo> getDoneTodos() {
-        return todos.stream().filter(Todo::isDone).collect(Collectors.toList());
+    private List<TodoDTO> getDoneTodos() {
+        return todos.stream().filter(TodoDTO::isDone).collect(Collectors.toList());
     }
 
-    private List<Todo> getDoneTodoByPriority(String priority){
-        List<Todo> doneTodos = getDoneTodos(); 
+    private List<TodoDTO> getDoneTodoByPriority(String priority){
+        List<TodoDTO> doneTodos = getDoneTodos(); 
         return doneTodos.stream().filter(todo -> todo.getPriority().equals(priority)).collect(Collectors.toList());
     }
 
-    private double calculateAllMetrics() {
-        List<Todo> doneTodos = getDoneTodos(); 
+    private String calculateAllMetrics() {
+        List<TodoDTO> doneTodos = getDoneTodos(); 
+        if (doneTodos.isEmpty()) {
+            return "00:00 minutes"; // Return 00:00 if there are no doneTodos
+        }
+
         long totalTime = doneTodos.stream()
-            .mapToLong(todo -> Duration.between(todo.getCreationDate(), todo.getDoneDate()).toMinutes()) 
+            .mapToLong(todo -> Duration.between(todo.getCreationDate(), todo.getDoneDate()).toSeconds()) 
             .sum();
-        return doneTodos.isEmpty() ? 0 : totalTime / (double) doneTodos.size();
+        long averageTime = totalTime / doneTodos.size(); 
+
+        return formatTime(averageTime); 
+    }
+
+    private String calculateMetricsByPriority(String priority){
+        List<TodoDTO> doneTodos = getDoneTodoByPriority(priority); 
+        if (doneTodos.isEmpty()) {
+            return "00:00 minutes"; // Return 00:00 if there are no doneTodos
+        }
+
+        long totalTime = doneTodos.stream()
+            .mapToLong(todo -> Duration.between(todo.getCreationDate(), todo.getDoneDate()).toSeconds()) 
+            .sum();
+        long averageTime = totalTime / doneTodos.size(); 
+
+        return formatTime(averageTime);
 
     }
 
-    private double calculateMetricsByPriority(String priority){
-        List<Todo> doneTodos = getDoneTodoByPriority(priority); 
-        long totalTime = doneTodos.stream()
-            .mapToLong(todo -> Duration.between(todo.getCreationDate(), todo.getDoneDate()).toMinutes()) 
-            .sum();
+    private String formatTime(double totalSeconds) {
+        if (totalSeconds >= 86400) {
+            return formatTimeAsDaysHHMM(totalSeconds);
 
-        return doneTodos.isEmpty() ? 0 : totalTime / (double) doneTodos.size();
-
+        } else if (totalSeconds >= 3600){
+            return formatTimeAsHHMM(totalSeconds);
+        } else {
+            return formatTimeAsMMSS(totalSeconds);
+        }
     }
+
+    private String formatTimeAsMMSS(double totalSeconds) {
+        long minutes = (long) totalSeconds / 60;
+        long seconds = (long) (totalSeconds % 60);
+        
+        return String.format("%02d:%02d minutes", minutes, seconds);
+    }
+
+    private String formatTimeAsHHMM(double totalSeconds) {
+        int hours = (int) (totalSeconds / 3600); // Cast to int
+        int minutes = (int) ((totalSeconds % 3600) / 60); // Cast to int
+        return String.format("%02d:%02d hours", hours, minutes);
+    }
+
+    private String formatTimeAsDaysHHMM(double totalSeconds) {
+        int days = (int) (totalSeconds / 86400); // 1 día = 86400 segundos
+        int hours = (int) ((totalSeconds % 86400) / 3600); // Resto de segundos dividido entre 3600 para obtener horas
+        int minutes = (int) ((totalSeconds % 3600) / 60); // Resto de segundos dividido entre 60 para obtener minutos
+        return String.format("%d %02d:%02d days", days, hours, minutes);
+    }
+
+    
 
 
 }
