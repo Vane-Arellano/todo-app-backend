@@ -16,8 +16,8 @@ public class TodoService {
     @Autowired
     private TodoRepository todoRepository; 
 
-    public List<TodoDTO> getTodosService(){
-        return todoRepository.getTodosRepository();
+    public Map<String, Object> getTodosService(int page, int size){
+        return todoRepository.getTodosRepository(page, size);
     }
 
     public Optional<TodoDTO> getTodoByIdService(String id){

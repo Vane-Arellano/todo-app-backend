@@ -16,8 +16,25 @@ public class TodoRepository {
     private final List<TodoDTO> todos = new ArrayList<>();
 
     // Function to get all todos 
-    public List<TodoDTO> getTodosRepository(){
-        return todos;
+    public Map<String, Object> getTodosRepository(int page, int size){
+
+        int start = page * size; 
+        int end = Math.min(start + size, todos.size());
+        List<TodoDTO> paginatedTodos = todos.subList(start, end);
+        int totalPages = todos.size() / size;
+
+        if(todos.size() % size != 0){
+            totalPages += 1;
+        }
+        
+        Map<String, Object> todosResponse = new HashMap<>();
+        todosResponse.put("todos", paginatedTodos);
+        todosResponse.put("totalTodos", todos.size());
+        todosResponse.put("totalPages", totalPages);
+
+
+
+        return todosResponse;
     }
 
     // Function to get todo by ID 
@@ -28,7 +45,7 @@ public class TodoRepository {
     // Create a new todo 
     public TodoDTO createTodoRepository(TodoDTO todo){
         
-        todos.add(todo);
+        todos.add(0, todo);
         return todo;
     }
 
