@@ -94,7 +94,6 @@ public class TodoRepository {
         metrics.put("medium", medium);
         metrics.put("high", high);
 
-        // Return the map
         return metrics;
     }
 

@@ -1,7 +1,6 @@
 package com.example.todo_app_backend.controllers;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -17,6 +16,7 @@ import com.example.todo_app_backend.services.TodoService;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -56,7 +56,7 @@ public class TodoController {
     }
 
     // Update todo status 
-    @PutMapping("/{id}/changeStatus")
+    @PatchMapping("/{id}/changeStatus")
     public boolean changeTodoStatus(@PathVariable String id) {
         return todoService.changeStatusService(id);
     }
