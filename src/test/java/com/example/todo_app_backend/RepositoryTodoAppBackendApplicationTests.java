@@ -17,7 +17,7 @@ import com.example.todo_app_backend.dtos.TodoDTO;
 import com.example.todo_app_backend.repositories.TodoRepository;
 
 @SpringBootTest
-class TodoAppBackendApplicationTests {
+class RepositoryTodoAppBackendApplicationTests {
 	
 	private TodoRepository todoRepository; 
 
@@ -30,10 +30,11 @@ class TodoAppBackendApplicationTests {
 	void testCreateTodoRepository() {
 		TodoDTO todo = new TodoDTO("Test Todo", "medium", Optional.of(LocalDateTime.now())); 
 		TodoDTO createdTodo = todoRepository.createTodoRepository(todo); 
-
+		Map<String, Object> todos = todoRepository.getTodosRepository(0, 10); 
+		
 		assertNotNull(createdTodo);
 		assertEquals("Test Todo", createdTodo.getName());
-		assertEquals(1, todoRepository.getTodosRepository(0, 10).size());
+		assertEquals(1, todos.get("totalTodos"));
 	}
 
 	@Test 
@@ -44,11 +45,12 @@ class TodoAppBackendApplicationTests {
 		todoRepository.createTodoRepository(todo1);
 		todoRepository.createTodoRepository(todo2);
 
-		Map<String, Object> todos = todoRepository.getTodosRepository(0, 10); 
-
-		assertEquals(2, todos.size());
-		// assertTrue(todos.contains(todo1));
-		// assertTrue(todos.contains(todo2));
+		Map<String, Object> todosResult = todoRepository.getTodosRepository(0, 10); 
+		List<TodoDTO> todos = (List<TodoDTO>) todosResult.get("todos");
+		
+		assertEquals(2, todosResult.get("totalTodos"));
+		assertTrue(todos.contains(todo1));
+		assertTrue(todos.contains(todo2));
 	}
 
 	@Test
@@ -89,9 +91,11 @@ class TodoAppBackendApplicationTests {
 		TodoDTO createdTodo = todoRepository.createTodoRepository(todo);
 
 		boolean isDeleted = todoRepository.deleteTodoRepository(createdTodo.getId()); 
+		Map<String, Object> todos = todoRepository.getTodosRepository(0, 10); 
 
+		
 		assertTrue(isDeleted);
-		assertEquals(0, todoRepository.getTodosRepository(0,10).size());
+		assertEquals(0, todos.get("totalTodos"));
 	}
 
 	@Test
@@ -115,13 +119,14 @@ class TodoAppBackendApplicationTests {
 		TodoDTO todo1 = new TodoDTO("Task test minutes", "low", now);
 		TodoDTO todo2 = new TodoDTO("Task test hours", "medium", now);
 		TodoDTO todo3 = new TodoDTO("Task test days", "high", now);
+		LocalDateTime doneDate = LocalDateTime.now();
 
 		todo1.setDone(true);
-		todo1.setDoneDate(todo1.getDoneDate().plusMinutes(30));
+		todo1.setDoneDate(doneDate.plusMinutes(30));
 		todo2.setDone(true);
-		todo2.setDoneDate(todo2.getDoneDate().plusHours(2));
+		todo2.setDoneDate(doneDate.plusHours(2));
 		todo3.setDone(true);
-		todo3.setDoneDate(todo3.getDoneDate().plusDays(1));
+		todo3.setDoneDate(doneDate.plusDays(1));
 
 		todoRepository.createTodoRepository(todo1);
 		todoRepository.createTodoRepository(todo2);
@@ -134,7 +139,7 @@ class TodoAppBackendApplicationTests {
 		assertTrue(metrics.containsKey("low"));
 		assertTrue(metrics.containsKey("medium"));
 		assertTrue(metrics.containsKey("high"));
-		assertEquals("00:30 minutes", metrics.get("low")); 
+		assertEquals("30:00 minutes", metrics.get("low")); 
 		assertEquals("02:00 hours", metrics.get("medium"));
 		assertEquals("1 00:00 days", metrics.get("high"));
 	}

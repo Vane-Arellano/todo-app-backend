@@ -19,11 +19,13 @@ public class TodoDTO {
     }
 
     public TodoDTO(String name, String priority, Optional<LocalDateTime> dueDate){
+        this.id = UUID.randomUUID().toString();
         this.name = name;
         this.dueDate = dueDate.orElse(null); 
         this.priority = priority;
         this.done = false;
         this.doneDate = null;
+        this.creationDate = LocalDateTime.now();
     }
 
     public String getId() {
