@@ -31,6 +31,10 @@ Ensure you have the following installed:
 
 ```mvn spring-boot:run```
 
+4. Run Application tests: 
+```mvn test```
+
+
 The backend service will be accessible at http://localhost:9090.
 
 API Endpoints
