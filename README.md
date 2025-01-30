@@ -5,8 +5,6 @@ This is the backend service for the Todo App, developed using Java and the Sprin
 ## Features
 
 - *Task Management*: APIs to create, read, update, and delete tasks.
-- *Data Persistence*: Utilizes a relational database to store task information.
-- *API Documentation*: Comprehensive documentation for all available endpoints.
 
 ## Prerequisites
 
