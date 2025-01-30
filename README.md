@@ -12,7 +12,6 @@ Ensure you have the following installed:
 
 - [Java Development Kit (JDK)](https://www.oracle.com/java/technologies/javase-jdk11-downloads.html) (version 11 or later)
 - [Apache Maven](https://maven.apache.org/) (for build automation)
-- [MySQL](https://www.mysql.com/) or another relational database
 
 ## Getting Started
 
