@@ -52,5 +52,4 @@ Project Structure
 Technologies Used
 - Java: Primary programming language.
 - Spring Boot: Framework for building the backend service.
-- MySQL: Relational database for data storage.
 - Maven: Build automation tool.
