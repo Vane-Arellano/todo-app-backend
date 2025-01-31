@@ -11,7 +11,7 @@ public class CorsConfig implements WebMvcConfigurer {
         // Allow CORS for all paths and all origins
         registry.addMapping("/**")  // All paths in your app
                 .allowedOrigins("http://localhost:3000", "http://localhost:8080")  // Origins allowed
-                .allowedMethods("GET", "POST", "PUT", "DELETE")  // Allowed HTTP methods
+                .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE")  // Allowed HTTP methods
                 .allowedHeaders("*")  // Allow all headers
                 .allowCredentials(true)  // Allow credentials (cookies, authorization headers)
                 .maxAge(3600);  // Cache the pre-flight response for 1 hour (in seconds)

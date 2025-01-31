@@ -56,7 +56,7 @@ public class TodoController {
     }
 
     // Update todo status 
-    @PutMapping("/{id}/changeStatus")
+    @PatchMapping("/{id}/changeStatus")
     public boolean changeTodoStatus(@PathVariable String id) {
         return todoService.changeStatusService(id);
     }
